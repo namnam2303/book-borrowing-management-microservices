@@ -28,17 +28,18 @@ public class BookEventHandler {
     @EventHandler
     public void on(BookUpdatedEvent event) {
         Optional<Book> oldBook = bookRepository.findById(event.getId());
-        if (oldBook.isPresent()) {
-            Book book = oldBook.get();
-            BeanUtils.copyProperties(event, book);
+        oldBook.ifPresent(book -> {
+            book.setName(event.getName());
+            book.setAuthor(event.getAuthor());
+            book.setIsReady(event.getIsReady());
             bookRepository.save(book);
-        }
+        });
     }
 
     @EventHandler
     public void on(BookDeletedEvent event){
         Optional<Book> oldBook = bookRepository.findById(event.getId());
-        oldBook.ifPresent(book -> bookRepository.delete((book)));
+        oldBook.ifPresent(bookRepository::delete);
     }
 
 //    @EventHandler
